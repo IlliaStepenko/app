@@ -7,9 +7,9 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 ADD ./requirements.txt /app/
-RUN pip install -U channels["daphne"]
 
+RUN pip install -U channels["daphne"]
 RUN pip install -r requirements.txt
 
-ADD ./docker /app/docker
+
 
