@@ -1,0 +1,64 @@
+version: '2'
+
+services:
+    server:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        entrypoint: /app/docker/server-entrypoint.sh
+        volumes:
+            - .:/app
+        ports:
+            - "8000:8000"
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+            DJANGO_DB: postgresql
+            POSTGRES_HOST: db
+            POSTGRES_NAME: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_PORT: 5432
+    worker:
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        volumes:
+            - .:/app
+        entrypoint: /app/docker/worker-entrypoint.sh
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+            DJANGO_DB: postgresql
+            POSTGRES_HOST: db
+            POSTGRES_NAME: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_PORT: 5432
+        depends_on:
+            - redis
+            - server
+    redis:
+        restart: unless-stopped
+        image: redis:7.0.5-alpine
+        expose:
+            - 6379
+    db:
+        image: postgres:13.0-alpine
+        restart: unless-stopped
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - "5432:5432"
+
+
+volumes:
+    static_volume: {}
+    postgres_data: {}
