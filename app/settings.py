@@ -115,6 +115,10 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_CACHE_BACKEND = 'default'
 STATIC_FILE_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 MEDIA_URL = 'media/'
 STATIC_URL = 'static/'
+
+if DEBUG:
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
